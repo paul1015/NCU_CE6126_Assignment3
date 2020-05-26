@@ -158,62 +158,32 @@ def main():
     j =  40
     swarm_num = 30
     epoch_num = 1000
-    # set the data set you want
-    print('Enter the data set you want (4, 6):')
-    dataChoose = int(input())
 
-    if(dataChoose == 4):
-        dataset = '4d'
-        print('dataset = ', dataset)
+ 
+    dataset = '4d'
+    print('dataset = ', dataset)
     
-        dim = 1 + j + 3*j + j
-        print('j, dim = ', j, dim)
+    dim = 1 + j + 3*j + j
+    print('j, dim = ', j, dim)
 
-        #get training data
-        f = open(r'train4d_All.txt')
-        i = 0
-        for line in f:
-            s = line.split(" ")
-            d = float(s[0])
-            ld = float(s[1])
-            rd = float(s[2])
-            car_angle = float(s[3].split('\n')[0])
-            if(i == 0):
-                xx = np.array([[d, ld, rd]])
-                yy = np.array([[car_angle]])
-            else :
-                xx = np.append(xx, np.array([[d, ld, rd]]), axis=0)
-                yy = np.append(yy, np.array([[car_angle]]), axis=0)
+    #get training data
+    f = open(r'train4d_All.txt')
+    i = 0
+    for line in f:
+        s = line.split(" ")
+        d = float(s[0])
+        ld = float(s[1])
+        rd = float(s[2])
+        car_angle = float(s[3].split('\n')[0])
+        if(i == 0):
+            xx = np.array([[d, ld, rd]])
+            yy = np.array([[car_angle]])
+        else :
+            xx = np.append(xx, np.array([[d, ld, rd]]), axis=0)
+            yy = np.append(yy, np.array([[car_angle]]), axis=0)
 
-            i = i + 1
+        i = i + 1
             
-    if(dataChoose == 6):
-        dataset = '6d'
-        print('dataset = ', dataset)
-    
-        dim = 1 + j + 5*j + j
-        print('j, dim = ', j, dim)
-
-        #get training data
-        f = open(r'train6d_All.txt')
-        i = 0
-        for line in f:
-            s = line.split(" ")
-            x = float(s[0])
-            y = float(s[1])
-            d = float(s[2])
-            ld = float(s[3])
-            rd = float(s[4])
-            car_angle = float(s[5].split('\n')[0])
-            if(i == 0):
-                xx = np.array([[x, y, d, ld, rd]])
-                yy = np.array([[car_angle]])
-            else :
-                xx = np.append(xx, np.array([[x, y, d, ld, rd]]), axis=0)
-                yy = np.append(yy, np.array([[car_angle]]), axis=0)
-
-            i = i + 1
-
 
   
     print('i = ', i)
@@ -230,34 +200,19 @@ def main():
     for epoch  in range (epoch_num):
             print('e = ', epoch)
             for i in range(swarm_num):
-                if(dataChoose == 4):
-                    # get varible for rbfn in swarm
-                    g_data[i:i+1, dim-j: dim] = abs(g_data[i:i+1, dim-j: dim])
-                    # print('e, i = ', e, i)
-                    thegma = g_data[i:i+1, 0:1]
-                    # print('thegma = ', thegma.shape)
-                    weight = g_data[i:i+1, 1: j+1]
-                    # print('weight = ', weight.shape)
-                    theta = g_data[i:i+1, dim-j: dim]
-                    # print('theta = ', theta)
-                    m = g_data[i: i+1, j+1: j+1+(3* j )]
-                    m = np.reshape(m, (j, 3))
-                    # print('m = ', m.shape)
+                # get varible for rbfn in swarm
+                g_data[i:i+1, dim-j: dim] = abs(g_data[i:i+1, dim-j: dim])
+                # print('e, i = ', e, i)
+                thegma = g_data[i:i+1, 0:1]
+                # print('thegma = ', thegma.shape)
+                weight = g_data[i:i+1, 1: j+1]
+                # print('weight = ', weight.shape)
+                theta = g_data[i:i+1, dim-j: dim]
+                # print('theta = ', theta)
+                m = g_data[i: i+1, j+1: j+1+(3* j )]
+                m = np.reshape(m, (j, 3))
+                # print('m = ', m.shape)
 
-                if(dataChoose == 6):
-                    # get varible for rbfn in swarm
-                    g_data[i:i+1, dim-j: dim] = abs(g_data[i:i+1, dim-j: dim])
-                    # print('e, i = ', e, i)
-                    thegma = g_data[i:i+1, 0:1]
-                    # print('thegma = ', thegma.shape)
-                    weight = g_data[i:i+1, 1: j+1]
-                    # print('weight = ', weight.shape)
-                    theta = g_data[i:i+1, dim-j: dim]
-                    # print('theta = ', theta)
-                    m = g_data[i: i+1, j+1: j+1+(5* j )]
-                    m = np.reshape(m, (j, 5))
-                    # print('m = ', m.shape)
-                
                 # set the variable
                 net = rbfNet(thegma, weight, m, theta)
 

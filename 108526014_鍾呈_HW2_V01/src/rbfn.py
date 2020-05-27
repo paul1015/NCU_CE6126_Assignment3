@@ -42,7 +42,24 @@ class rbfNet(object):
         n = n * weight
         return n
 
-    
+# PSO optimizier 
+class psoOptimaizer(object):
+    # set initial variable
+    def __init__(self, swarm, j, dim):
+        self.swarm = swarm
+        self.j = j
+        self.dim = dim
+        self.theta1 = 0.3
+        self.theta2 = 0.3
+
+        print('self.swarm size , ', np.size(self.swarm[0], 0))
+        self.vt0 = np.zeros((np.size(self.swarm[0], 0), dim))
+
+        self.pi = np.full((np.size(self.swarm[0], 0), dim), 100)
+        self.pg = np.full((1, 1), 100)
+
+
+
 
 # geneticOptimizer
 class geneticOptimizer(object):
@@ -154,10 +171,10 @@ class geneticOptimizer(object):
 
 
 def main():
-    # set initial data
-    j =  40
+    # set initial data 
+    j =  6
     swarm_num = 30
-    epoch_num = 1000
+    epoch_num = 1
 
  
     dataset = '4d'

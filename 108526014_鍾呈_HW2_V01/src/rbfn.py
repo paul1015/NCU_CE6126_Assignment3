@@ -46,19 +46,29 @@ class rbfNet(object):
 class psoOptimaizer(object):
     # set initial variable
     def __init__(self, swarm, j, dim):
-        self.swarm = swarm
+        self.x = swarm
         self.j = j
         self.dim = dim
         self.theta1 = 0.3
         self.theta2 = 0.3
 
-        print('self.swarm size , ', np.size(self.swarm[0], 0))
-        self.vt0 = np.zeros((np.size(self.swarm[0], 0), dim))
+        print('self.swarm size , ', np.shape(swarm)[0])
+        self.vt0 = np.zeros(( np.shape(swarm)[0] , dim))
 
-        self.pi = np.full((np.size(self.swarm[0], 0), dim), 100)
+        self.pi = swarm
         self.pg = np.full((1, 1), 100)
 
-
+    def computev(self, err_rate):
+        print('err_rate', err_rate)
+        y = np.argsort(err_rate , axis=0)
+        print('y', y, y[0][0])
+        int_i = int(y[0][0])
+        print('x', self.x)
+        self.pg = self.x[int_i: int_i + 1, :]
+        print('pg ', self.pg)
+        
+        vt1 = self.vt0 + self.theta1 * (self.pi - self.x) 
+        
 
 
 # geneticOptimizer
@@ -172,8 +182,8 @@ class geneticOptimizer(object):
 
 def main():
     # set initial data 
-    j =  6
-    swarm_num = 30
+    j =  1
+    swarm_num = 10
     epoch_num = 1
 
  
@@ -262,10 +272,15 @@ def main():
                 
                 
 
+            # # put swarm data and error rate in geneticOptimizer 
+            # g_opt = geneticOptimizer(g_data, err_rate, j,  dim)
+            # # update variable 
+            # g_data = g_opt.genatic_opt()
+
             # put swarm data and error rate in geneticOptimizer 
-            g_opt = geneticOptimizer(g_data, err_rate, j,  dim)
+            g_opt = psoOptimaizer(g_data, j,  dim)
             # update variable 
-            g_data = g_opt.genatic_opt()
+            g_opt.computev(err_rate)
            
             # print out the network information in epoch
             print('epoch best --> ', repr(best_var), pre_angle, pre_angle.shape, j, dim, best_err, best_epoch, epoch)

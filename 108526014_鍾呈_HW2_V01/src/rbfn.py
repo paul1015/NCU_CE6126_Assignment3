@@ -49,27 +49,48 @@ class psoOptimaizer(object):
         self.x = swarm
         self.j = j
         self.dim = dim
-        self.theta1 = 0.3
-        self.theta2 = 0.3
+        self.theta1 = 0.01
+        self.theta2 = 0.05
 
-        print('self.swarm size , ', np.shape(swarm)[0])
+        # print('self.swarm size , ', np.shape(swarm)[0])
         self.vt0 = np.zeros(( np.shape(swarm)[0] , dim))
 
+        
         self.pi = swarm
+        self.pi_err = np.full((np.shape(swarm)[0], 1), 100000)
         self.pg = np.full((1, 1), 100)
 
-    def computev(self, err_rate):
-        print('err_rate', err_rate)
-        y = np.argsort(err_rate , axis=0)
+
+    def psoOutput(self, err_rate):
+        print('err_rate', err_rate, self.pi_err)
+        for i in range(np.shape(err_rate)[0]):
+            if(err_rate[i] < self.pi_err[i]):
+                self.pi[i] = self.x[i]
+                self.pi_err[i] = err_rate[i]
+        # print('err_rate after', self.pi_err)
+        y = np.argsort(self.pi_err , axis=0)
         print('y', y, y[0][0])
         int_i = int(y[0][0])
-        print('x', self.x)
-        self.pg = self.x[int_i: int_i + 1, :]
-        print('pg ', self.pg)
+        # print('x', self.x)
+        pg = self.x[int_i: int_i + 1, :]
+        # print('pg ', pg)
         
-        vt1 = self.vt0 + self.theta1 * (self.pi - self.x) 
-        
+        self.pg = np.repeat(pg, np.shape(err_rate)[0])
+        for i in range(np.shape(err_rate)[0]):
+            if(i == 0):
+                self.pg = pg
+            else :
+                self.pg = np.append(self.pg, pg, axis=0)
 
+        # print('self.pg', self.pg, self.pg.shape)
+
+        print('self.x', self.x, self.pg, self.pi)
+        vt1 = self.vt0 + self.theta1 * (self.pi - self.x) + self.theta2 * (self.pg - self.x)
+
+        self.x = self.x + vt1
+        self.vt0 = vt1
+        
+        return self.x 
 
 # geneticOptimizer
 class geneticOptimizer(object):
@@ -183,8 +204,8 @@ class geneticOptimizer(object):
 def main():
     # set initial data 
     j =  1
-    swarm_num = 10
-    epoch_num = 1
+    swarm_num = 5
+    epoch_num = 10
 
  
     dataset = '4d'
@@ -224,6 +245,7 @@ def main():
     num_x = i 
     best_err = 100
     best_var = 100
+    g_opt = psoOptimaizer(g_data, j,  dim)
     for epoch  in range (epoch_num):
             print('e = ', epoch)
             for i in range(swarm_num):
@@ -278,9 +300,9 @@ def main():
             # g_data = g_opt.genatic_opt()
 
             # put swarm data and error rate in geneticOptimizer 
-            g_opt = psoOptimaizer(g_data, j,  dim)
+            
             # update variable 
-            g_opt.computev(err_rate)
+            g_data = g_opt.psoOutput(err_rate)
            
             # print out the network information in epoch
             print('epoch best --> ', repr(best_var), pre_angle, pre_angle.shape, j, dim, best_err, best_epoch, epoch)
